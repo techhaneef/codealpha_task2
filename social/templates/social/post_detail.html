@@ -1,0 +1,35 @@
+{% extends 'social/base.html' %}
+{% block title %}Post by {{ post.author.username }}{% endblock %}
+{% block content %}
+
+{% include 'social/_post_card.html' %}
+
+<h3 class="section-title">Comments</h3>
+
+{% if user.is_authenticated %}
+<form method="post" class="comment-form">
+    {% csrf_token %}
+    {{ form.content }}
+    <button type="submit" class="btn btn-primary">Comment</button>
+</form>
+{% for error in form.content.errors %}<p class="error">{{ error }}</p>{% endfor %}
+{% else %}
+<p><a href="{% url 'login' %}">Log in</a> to comment.</p>
+{% endif %}
+
+<div class="comment-list">
+    {% for comment in comments %}
+        <div class="comment">
+            <a href="{% url 'profile' comment.author.username %}" class="avatar small">{{ comment.author.username|first|upper }}</a>
+            <div>
+                <a href="{% url 'profile' comment.author.username %}" class="comment-author">{{ comment.author.username }}</a>
+                <span class="comment-content">{{ comment.content }}</span>
+                <div class="post-time">{{ comment.created_at|date:"M d, Y \a\t g:i A" }}</div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="empty-state">No comments yet. Start the conversation!</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

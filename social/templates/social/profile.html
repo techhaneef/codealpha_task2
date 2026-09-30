@@ -1,0 +1,42 @@
+{% extends 'social/base.html' %}
+{% block title %}{{ profile_user.username }}'s profile{% endblock %}
+{% block content %}
+
+<div class="profile-header">
+    <div class="avatar big">{{ profile_user.username|first|upper }}</div>
+    <div class="profile-info">
+        <h2>{{ profile_user.username }}</h2>
+        {% if profile_user.profile.bio %}
+            <p class="bio">{{ profile_user.profile.bio }}</p>
+        {% else %}
+            <p class="bio muted">No bio yet.</p>
+        {% endif %}
+        <div class="stats">
+            <span><strong>{{ profile_user.profile.posts_count }}</strong> posts</span>
+            <span><strong id="followers-count">{{ profile_user.profile.followers_count }}</strong> followers</span>
+            <span><strong>{{ profile_user.profile.following_count }}</strong> following</span>
+        </div>
+
+        {% if request.user.is_authenticated and request.user != profile_user %}
+            <button id="follow-btn"
+                    class="btn {% if is_following %}btn-secondary{% else %}btn-primary{% endif %}"
+                    data-username="{{ profile_user.username }}"
+                    data-following="{{ is_following|yesno:'true,false' }}">
+                {% if is_following %}Unfollow{% else %}Follow{% endif %}
+            </button>
+        {% elif request.user == profile_user %}
+            <a href="{% url 'edit_profile' %}" class="btn btn-secondary">Edit Bio</a>
+        {% endif %}
+    </div>
+</div>
+
+<h3 class="section-title">Posts</h3>
+<div class="post-list">
+    {% for post in posts %}
+        {% include 'social/_post_card.html' %}
+    {% empty %}
+        <p class="empty-state">No posts yet.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

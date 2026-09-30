@@ -1,0 +1,29 @@
+{% load social_extras %}
+<div class="post-card" data-post-id="{{ post.id }}">
+    <div class="post-header">
+        <a href="{% url 'profile' post.author.username %}" class="avatar">{{ post.author.username|first|upper }}</a>
+        <div>
+            <a href="{% url 'profile' post.author.username %}" class="post-author">{{ post.author.username }}</a>
+            <div class="post-time">{{ post.created_at|date:"M d, Y \a\t g:i A" }}</div>
+        </div>
+        {% if request.user == post.author %}
+        <form action="{% url 'delete_post' post.id %}" method="post" class="inline-form post-delete"
+              onsubmit="return confirm('Delete this post?');">
+            {% csrf_token %}
+            <button type="submit" class="link-button danger">Delete</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <p class="post-content">{{ post.content }}</p>
+
+    {% with liked=post|is_liked_by:request.user %}
+    <div class="post-actions">
+        <button class="like-btn {% if liked %}liked{% endif %}" data-post-id="{{ post.id }}">
+            <span class="heart">{% if liked %}♥{% else %}♡{% endif %}</span>
+            <span class="like-count">{{ post.likes_count }}</span>
+        </button>
+        <a href="{% url 'post_detail' post.id %}" class="comment-link">💬 {{ post.comments_count }} comments</a>
+    </div>
+    {% endwith %}
+</div>
